@@ -15,9 +15,22 @@ return [
             'class' => 'api\modules\v1\Module',
         ],
     ],
+
     'components' => [
         'request' => [
             'csrfParam' => '_csrf-api',
+        ],
+        'response' => [
+            'class' => 'yii\web\Response',
+            'on beforeSend' => function ($event) {
+                $response = $event->sender;
+                $response->data = [
+                    'code' => $response->getStatusCode(),
+                    'data' => $response->data,
+                    'message' => $response->statusText
+                ];
+                $response->format = yii\web\Response::FORMAT_JSON;
+            },
         ],
 //        'user' => [
 //            'identityClass' => 'common\models\User',
