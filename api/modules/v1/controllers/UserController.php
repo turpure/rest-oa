@@ -6,6 +6,7 @@ use yii\helpers\ArrayHelper;
 use yii\filters\auth\QueryParamAuth;
 use common\models\User;
 use api\models\LoginForm;
+use api\models\SignupForm;
 use Yii;
 
 class UserController extends ActiveController
@@ -19,7 +20,7 @@ class UserController extends ActiveController
                 'tokenParam' => 'token',
                 'optional' => [
                     'login',
-                    'signup-test'
+                    'signup'
                 ],
             ]
         ] );
@@ -28,6 +29,7 @@ class UserController extends ActiveController
     /**
      * sing-up-test
      */
+    /*
     public function actionSignupTest ()
     {
         $request = Yii::$app->request;
@@ -50,7 +52,19 @@ class UserController extends ActiveController
             'code' => 0
         ];
     }
-
+*/
+    /**
+     * sing up
+     */
+    public function actionSignup ()
+    {
+        $model = new SignupForm();
+        $model->setAttributes(Yii::$app->request->post());
+        if($model->signup()){
+            return [];
+        }
+        return $model->errors;
+    }
     /**
      * login
      */
