@@ -222,4 +222,16 @@ class User extends ActiveRecord implements IdentityInterface
         return static::findOne(['access_token' => $token, 'status' => self::STATUS_ACTIVE]);
         // throw new NotSupportedException('"findIdentityByAccessToken" is not implemented.');
     }
+
+
+    public function loginByAccessToken($token, $type = null)
+    {
+        /* @var $class IdentityInterface */
+        $class = $this->identityClass;
+        $identity = $class::findIdentityByAccessToken($token, $type);
+        if ($identity && $this->login($identity)) {
+            return $identity;
+        }
+        return null;
+    }
 }

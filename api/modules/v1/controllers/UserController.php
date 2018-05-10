@@ -3,6 +3,9 @@
 namespace api\modules\v1\controllers;
 use yii\rest\ActiveController;
 use yii\helpers\ArrayHelper;
+use yii\filters\auth\CompositeAuth;
+use yii\filters\auth\HttpBasicAuth;
+use yii\filters\auth\HttpBearerAuth;
 use yii\filters\auth\QueryParamAuth;
 use common\models\User;
 use api\models\LoginForm;
@@ -13,18 +16,25 @@ class UserController extends ActiveController
 {
     public $modelClass = 'api\models\User';
 
-    public function behaviors() {
-        return ArrayHelper::merge (parent::behaviors(), [
-            'authenticator' => [
-                'class' => QueryParamAuth::className(),
-                'tokenParam' => 'token',
-                'optional' => [
+    public function behaviors()
+        {
+            $behaviors = parent::behaviors();
+            $behaviors['authenticator'] = [
+                'class' => CompositeAuth::className(),
+
+                'authMethods' => [
+//                    ['class' => HttpBasicAuth::className()],
+//                    ['class' => HttpBearerAuth::className()],
+                    ['class' => QueryParamAuth::className(),'tokenParam' => 'token',],
+
+                ],
+                'optional' =>[
                     'login',
                     'signup'
-                ],
-            ]
-        ] );
-    }
+                ]
+            ];
+            return $behaviors;
+        }
 
     /**
      * sing-up-test
@@ -86,10 +96,31 @@ class UserController extends ActiveController
     /**
      * 获取用户信息
      */
-    public function actionUserProfile ($token)
+    public function actionUserProfile ()
     {
         // 到这一步，token都认为是有效的了
-        // 下面只需要实现业务逻辑即可，下面仅仅作为案例，比如你可能需要关联其他表获取用户信息等等
+        // 下面只需要实现业务逻辑即可，下面仅仅作为案例，比如你可能需要关联其他表获取用户信息等o等
+        /* get user by token
+        $token = Yii::$app->request->get()['token'];
+        $user = User::findIdentityByAccessToken($token);
+        */
+        // get user by authenticating
+        $user = $this->authenticate(Yii::$app->user, Yii::$app->request, Yii::$app->response);
+        return [
+            'id' => $user->id,
+            'username' => $user->username,
+            'email' => $user->email,
+        ];
+    }
+
+    /**
+     * 获取用户信息
+     */
+    public function actionInfo ()
+    {
+        $headers = Yii::$app->request->headers;
+
+        var_dump($headers);die;
         $user = User::findIdentityByAccessToken($token);
         return [
             'id' => $user->id,
