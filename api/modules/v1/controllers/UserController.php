@@ -33,8 +33,8 @@ class UserController extends ActiveController
 
                 'authMethods' => [
                     ['class' => HttpBasicAuth::className(),'auth' => [$this, 'auth']],
-//                    ['class' => HttpBearerAuth::className()],
-//                    ['class' => QueryParamAuth::className(),'tokenParam' => 'token',],
+                    ['class' => HttpBearerAuth::className()],
+                    ['class' => QueryParamAuth::className(),'tokenParam' => 'token',],
 
                 ],
                 'optional' =>[
