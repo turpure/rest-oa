@@ -11,6 +11,7 @@ use common\models\User;
 use api\models\LoginForm;
 use api\models\SignupForm;
 use Yii;
+use yii\filters\Cors;
 
 class UserController extends ActiveController
 {
@@ -18,14 +19,21 @@ class UserController extends ActiveController
 
     public function behaviors()
         {
-            $behaviors = parent::behaviors();
+            $behaviors = ArrayHelper::merge([
+                [
+                    'class' => Cors::className(),
+                ]
+            ],
+                parent::behaviors()
+            );
+
             $behaviors['authenticator'] = [
                 'class' => CompositeAuth::className(),
 
                 'authMethods' => [
 //                    ['class' => HttpBasicAuth::className()],
-//                    ['class' => HttpBearerAuth::className()],
-                    ['class' => QueryParamAuth::className(),'tokenParam' => 'token',],
+                    ['class' => HttpBearerAuth::className()],
+//                    ['class' => QueryParamAuth::className(),'tokenParam' => 'token',],
 
                 ],
                 'optional' =>[
@@ -36,6 +44,11 @@ class UserController extends ActiveController
             return $behaviors;
         }
 
+    public function actions()
+    {
+        $actions =  parent::actions();
+        return $actions;
+    }
     /**
      * sing-up-test
      */
@@ -118,10 +131,8 @@ class UserController extends ActiveController
      */
     public function actionInfo ()
     {
-        $headers = Yii::$app->request->headers;
 
-        var_dump($headers);die;
-        $user = User::findIdentityByAccessToken($token);
+        $user = $this->authenticate(Yii::$app->user, Yii::$app->request, Yii::$app->response);
         return [
             'id' => $user->id,
             'username' => $user->username,

@@ -17,9 +17,9 @@ return [
     ],
 
     'components' => [
-        'request' => [
-            'csrfParam' => '_csrf-api',
-        ],
+//        'request' => [
+//            'csrfParam' => '_csrf-api',
+//        ],
         'response' => [
             'class' => 'yii\web\Response',
             'on beforeSend' => function ($event) {
