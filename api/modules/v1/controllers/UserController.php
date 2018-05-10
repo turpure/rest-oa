@@ -12,6 +12,7 @@ use api\models\LoginForm;
 use api\models\SignupForm;
 use Yii;
 use yii\filters\Cors;
+use yii\base\UserException;
 
 class UserController extends ActiveController
 {
@@ -31,8 +32,8 @@ class UserController extends ActiveController
                 'class' => CompositeAuth::className(),
 
                 'authMethods' => [
-//                    ['class' => HttpBasicAuth::className()],
-                    ['class' => HttpBearerAuth::className()],
+                    ['class' => HttpBasicAuth::className(),'auth' => [$this, 'auth']],
+//                    ['class' => HttpBearerAuth::className()],
 //                    ['class' => QueryParamAuth::className(),'tokenParam' => 'token',],
 
                 ],
@@ -138,5 +139,21 @@ class UserController extends ActiveController
             'username' => $user->username,
             'email' => $user->email,
         ];
+    }
+
+    public function auth($username, $password)
+    {
+        $user = User::findByUsername($username);
+        if(empty($username) || empty($password) || empty($user)) {
+            //return false;
+            //OR
+            throw new UserException("There is an error!");
+        }
+        if ($user->validatePassword($password)) {
+            return $user;
+        }
+        //return false;
+        //OR
+        throw new UserException("Wrong username or password!");
     }
 }
