@@ -19,10 +19,18 @@ return [
         ],
         'oauth2' => [
             'class' => 'filsh\yii2\oauth2server\Module',
+            'components' => [
+                'request' => function () {
+                    return \filsh\yii2\oauth2server\Request::createFromGlobals();
+                },
+                'response' => [
+                    'class' => \filsh\yii2\oauth2server\Response::className(),
+                ],
+            ],
             'tokenParamName' => 'token',
             'tokenAccessLifetime' => 3600 * 24,
             'storageMap' => [
-                'user_credentials' => 'common\models\User',
+                'user_credentials' => 'common\models\Auth',
             ],
             'grantTypes' => [
                 'user_credentials' => [
@@ -92,6 +100,7 @@ return [
             'showScriptName' => false,
 //            'enableStrictParsing' =>true,
             'rules' => [
+                'POST oauth2/<action:\w+>' => 'oauth2/rest/<action>',
                 //权限
                 [
                     'class' => 'yii\rest\UrlRule',
