@@ -22,6 +22,9 @@ return [
           ],
     ],
     'components' => [
+        'authManager' => [
+            'class' => 'wind\rest\components\DbManager', //配置文件
+        ],
         'log' => [
             'targets' => [
                 [
